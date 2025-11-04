@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Registro por Código</title>
+  <style>
+    :root{
+      --bg:#0b1220;         /* fondo oscuro elegante */
+      --card:#0f172a;       /* slate-900 */
+      --muted:#94a3b8;      /* slate-400/500 */
+      --text:#e2e8f0;       /* slate-200 */
+      --accent:#22d3ee;     /* cyan-400 */
+      --accent-2:#6ee7b7;   /* emerald-300 */
+      --ring: rgba(34,211,238,.35);
+      --radius:18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, "Helvetica Neue", sans-serif;
+      color:var(--text); background: radial-gradient(1200px 800px at 20% -10%, rgba(34,211,238,.12), transparent 40%),radial-gradient(900px 600px at 110% 10%, rgba(110,231,183,.10), transparent 40%), var(--bg);
+      display:grid; place-items:start center; padding:24px; gap:18px;
+    }
+
+    /* ================= Hero logo fuera de la tarjeta ================= */
+    .hero-logo{
+      width:min(110px, 30vw); height:auto; border-radius:18px; object-fit:cover;
+      border:1px solid rgba(255,255,255,.08); box-shadow:var(--shadow);
+    }
+
+    .wrap{width:min(960px,96vw)}
+
+    .card{
+      position:relative; background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00)), var(--card);
+      border-radius:var(--radius); padding:28px; box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .header{display:flex; align-items:center; gap:14px; margin-bottom:18px}
+    .title{font-weight:700; font-size: clamp(18px, 3vw, 24px)}
+    .subtitle{color:var(--muted); font-size:14px}
+
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:18px}
+    @media (max-width:680px){ .grid{grid-template-columns:1fr} }
+
+    .input-group{display:grid; gap:8px; position:relative}
+    label{font-size:14px; color:var(--muted)}
+    .input{
+      background:rgba(2,6,23,.6); border:1px solid rgba(255,255,255,.08);
+      color:var(--text); padding:12px 14px; border-radius:12px; outline:none;
+      transition:.2s border-color,.2s box-shadow,.2s transform;
+    }
+    .input:focus{ border-color: var(--accent); box-shadow: 0 0 0 6px var(--ring)}
+
+    .cells{
+      display:grid; gap:10px; grid-auto-rows:minmax(44px,auto);
+    }
+    .cell{display:flex; align-items:center; justify-content:space-between; gap:12px; background:rgba(2,6,23,.6); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px}
+    .cell .key{color:var(--muted); font-size:13px}
+    .cell .val{font-weight:600; letter-spacing:.2px; min-height:1.2em}
+    .cell .placeholder{opacity:.45; font-style:italic}
+
+    .status{margin-top:16px; color:var(--muted); font-size:13px}
+    .status strong{color:var(--accent)}
+
+    /* ================= Sugerencias ================= */
+    .suggest{position:relative}
+    .dropdown{
+      position:absolute; top:100%; left:0; right:auto; min-width:260px; margin-top:8px;
+      background:rgba(2,6,23,.98); border:1px solid rgba(255,255,255,.06);
+      border-radius:12px; box-shadow:var(--shadow); overflow:hidden; display:none; z-index:20;
+    }
+    .dropdown.show{display:block}
+    .item{padding:10px 12px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .item:hover{background:rgba(34,211,238,.10)}
+    .badge{font-size:11px; color:#0e1726; background:linear-gradient(90deg, var(--accent), var(--accent-2)); padding:4px 8px; border-radius:999px; font-weight:700}
+
+    .footer{margin-top:22px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+    .btn{
+      appearance:none; border:none; cursor:pointer; padding:10px 14px; border-radius:12px; font-weight:700;
+      background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#062026; box-shadow: 0 6px 18px rgba(34,211,238,.25);
+    }
+    .ghost{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.12)}
+    .kbd{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; background:rgba(2,6,23,.6); border:1px solid rgba(255,255,255,.08); padding:2px 6px; border-radius:8px}
+  </style>
+</head>
+<body>
+  <img class="hero-logo" src="logo dos bandras blanco.png" alt="Logo" onerror="this.style.display='none'">
+
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div>
+          <div class="title">Sistema de trazabilidad</div>
+
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="input-group suggest">
+          <label for="codigo">Código</label>
+          <input id="codigo" class="input" placeholder="Ej: 999000019000037" autocomplete="off"/>
+          <div id="dropdown" class="dropdown" role="listbox" aria-label="Sugerencias"></div>
+        </div>
+
+        <div class="input-group">
+          <label>Estado</label>
+          <div class="cell"><span class="key">Estado</span><span id="estado" class="val">Listo.</span></div>
+        </div>
+      </div>
+
+      <div class="cells" id="celdas"></div>
+
+      <div class="footer">
+
+        <div style="display:flex; gap:10px">
+          <button class="btn" id="limpiar">Limpiar</button>
+          <button class="btn ghost" id="copiar">Copiar URL</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+ 
+    const DATOS = {
+      "999000019000037": { fechaNacimiento: "2023-09-10", pesoKg: 540, numeroVaca: 123 },
+      "900000000000049": { fechaNacimiento: "2022-02-18", pesoKg: 598, numeroVaca: 507 },
+      "999000019000034": { fechaNacimiento: "2021-12-01", pesoKg: 505, numeroVaca: 301 },
+    };
+
+    // Orden y etiquetas
+    const CAMPOS = [
+      ["fechaNacimiento", "Fecha de nacimiento"],
+      ["pesoKg", "Peso de la vaca"],
+      ["numeroVaca", "Número de la vaca"],
+    ];
+
+    // ============================
+    // 2) Utilidades UI
+    // ============================
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    const estado = msg => { $("#estado").textContent = msg };
+
+    const celdasEl = $("#celdas");
+    function renderCeldas(values={}){
+      celdasEl.innerHTML = CAMPOS.map(([key, label])=>{
+        const v = values?.[key];
+        const show = v === undefined || v === null || v === "";
+        const content = show ? `<span class="placeholder">— ${label}</span>` : `${v}`;
+        return `<div class="cell"><span class="key">${label}</span><span class="val" id="val-${key}">${content}</span></div>`
+      }).join("");
+    }
+
+    function setValues(values){
+      CAMPOS.forEach(([key, label])=>{
+        const el = $("#val-"+key);
+        if(!el) return;
+        const v = values?.[key];
+        if(v === undefined || v === null || v === ""){
+          el.innerHTML = `<span class=\"placeholder\">— ${label}</span>`;
+        } else {
+          el.textContent = v;
+        }
+      });
+    }
+
+    // inicial
+    renderCeldas();
+
+    // ============================
+    // 3) Autocompletar + validaciones
+    // ============================
+    const input = $("#codigo");
+    const dropdown = $("#dropdown");
+
+    function yearsBetween(isoDate){
+      const d = new Date(isoDate);
+      if(isNaN(d)) return Infinity;
+      const now = new Date();
+      let y = now.getFullYear() - d.getFullYear();
+      const m = now.getMonth() - d.getMonth();
+      if(m < 0 || (m === 0 && now.getDate() < d.getDate())) y--;
+      return y;
+    }
+
+    function validate(data){
+      const warns = [];
+      if(data.fechaNacimiento){
+        const age = yearsBetween(data.fechaNacimiento);
+        if(age > 5) warns.push(`Edad ${age} años: excede 5 años.`);
+      }
+      if(data.pesoKg !== undefined){
+        const p = Number(data.pesoKg);
+        if(!(p >= 500 && p <= 600)) warns.push(`Peso ${p} kg fuera de 500–600 kg.`);
+      }
+      if(data.numeroVaca !== undefined){
+        const ok = /^\d{3}$/.test(String(data.numeroVaca));
+        if(!ok) warns.push(`Número de vaca debe ser 3 dígitos (ej. 123).`);
+      }
+      return warns;
+    }
+
+    function showSuggestions(part){
+      const q = (part||"").trim().toUpperCase();
+      if(!q){ hideDropdown(); return; }
+      const items = Object.keys(DATOS).filter(k=>k.includes(q)).slice(0,6);
+      if(!items.length){ hideDropdown(); return; }
+      dropdown.innerHTML = items.map(k=>`<div class="item" data-code="${k}"><span>${k}</span><span class="badge">Sugerencia</span></div>`).join("");
+      dropdown.classList.add("show");
+    }
+
+    function hideDropdown(){ dropdown.classList.remove("show"); dropdown.innerHTML=""; }
+
+    dropdown.addEventListener("click", (e)=>{
+      const d = e.target.closest(".item");
+      if(!d) return;
+      const code = d.getAttribute("data-code");
+      input.value = code;
+      hideDropdown();
+      applyCode(code);
+      input.focus();
+    });
+
+    function applyCode(raw){
+      const code = (raw||"").trim().toUpperCase();
+      if(!code){ setValues({}); estado("Listo."); hideDropdown(); return; }
+      const data = DATOS[code];
+      if(data){
+        setValues(data);
+        const warns = validate(data);
+        estado(warns.length ? `Datos cargados. Avisos: ${warns.join(" | ")}` : "Datos cargados correctamente.");
+        // Si hay coincidencia exacta, cerramos sugerencias para que no tape nada
+        hideDropdown();
+      } else {
+        setValues({}); estado("Código no encontrado.");
+        showSuggestions(code);
+      }
+    }
+
+    input.addEventListener("input", (e)=>{
+      const v = e.target.value;
+      applyCode(v);
+    });
+
+    // Cerrar sugerencias al hacer clic fuera o con Escape
+    document.addEventListener("click", (e)=>{
+      if(!e.target.closest('.suggest')) hideDropdown();
+    });
+    document.addEventListener("keydown", (e)=>{
+      if(e.key === 'Escape') hideDropdown();
+    });
+
+    // ============================
+    // 4) Acciones
+    // ============================
+    $("#limpiar").addEventListener("click", ()=>{
+      input.value = ""; setValues({}); estado("Listo."); hideDropdown(); input.focus();
+    });
+
+    $("#copiar").addEventListener("click", async ()=>{
+      try{ await navigator.clipboard.writeText(location.href); estado("URL copiada al portapapeles."); }
+      catch{ estado("No se pudo copiar la URL."); }
+    });
+
+    // ============================
+    // 5) Soporte de querystring ?code=A123
+    // ============================
+    const params = new URLSearchParams(location.search);
+    if(params.has("code")){
+      const c = params.get("code"); input.value = c; applyCode(c);
+    }
+  </script>
+</body>
+</html>
